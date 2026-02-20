@@ -3,73 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Boost — Бесплатная накрутка</title>
+    <title>Накрутка TikTok — Заработок</title>
     <style>
-        body { font-family: sans-serif; background: #121212; color: white; text-align: center; padding: 50px 10px; }
-        .container { background: #1e1e1e; padding: 30px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 0 20px rgba(255, 0, 80, 0.5); border: 1px solid #ff0050; }
-        h1 { color: #ff0050; text-shadow: 0 0 10px rgba(255, 0, 80, 0.5); }
-        input, select { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #222; color: white; }
-        button { background: linear-gradient(45deg, #ff0050, #00f2ea); color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        .status { margin-top: 20px; font-size: 14px; color: #00f2ea; min-height: 40px; }
-        
-        /* Стиль для всплывашек */
-        #notification { position: fixed; bottom: 20px; left: 20px; background: #333; padding: 10px 20px; border-radius: 10px; border-left: 5px solid #00f2ea; display: none; animation: slideIn 0.5s; z-index: 100; font-size: 13px; }
-        @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+        body { font-family: sans-serif; background: #121212; color: white; text-align: center; padding: 50px; }
+        .container { background: #1e1e1e; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        input, select { padding: 10px; width: 80%; margin: 10px 0; border-radius: 5px; border: none; }
+        button { background: #ff0050; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 85%; }
+        button:hover { background: #d60045; }
+        .status { margin-top: 15px; color: #00ff00; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div id="notification"></div>
-
-<div class="container">
-    <h1>TikTok Free</h1>
-    <p>Введите ссылку на профиль:</p>
-    <input type="text" id="url" placeholder="https://www.tiktok.com/@user">
-    
-    <p>Выберите количество:</p>
-    <select id="count">
-        <option value="100">100 подписчиков</option>
-        <option value="500">500 подписчиков</option>
-        <option value="1000">1000 подписчиков</option>
-    </select>
-
-    <button onclick="startBoost()">ЗАПУСТИТЬ НАКРУТКУ</button>
-    <div id="msg" class="status"></div>
-</div>
-
-<script>
-    // Настройки живой ленты
-    const names = ["Dmitry", "Ангелина", "Артем", "User_77", "Kira", "Maks", "Liana", "Nika", "Tiktok_Boss"];
-    const counts = [100, 250, 500, 1000];
-
-    function showNotif() {
-        const notif = document.getElementById('notification');
-        const randomName = names[Math.floor(Math.random() * names.length)];
-        const randomCount = counts[Math.floor(Math.random() * counts.length)];
+    <div class="container">
+        <h1>TikTok Boost</h1>
+        <p>Введите ник и количество</p>
         
-        notif.innerHTML = <b>@${randomName}</b> только что получил <b>${randomCount}</b> подписчиков ✅;
-        notif.style.display = 'block';
+        <input type="text" id="nickname" placeholder="Ваш ник (например: user123)">
         
-        setTimeout(() => { notif.style.display = 'none'; }, 4000);
-    }
-    setInterval(showNotif, 8000); // Повторять каждые 8 секунд
+        <select id="amount">
+            <option value="10">10 подписчиков — 5 грн</option>
+            <option value="50">50 подписчиков — 20 грн</option>
+            <option value="100">100 подписчиков — 35 грн</option>
+        </select>
 
-    function startBoost() {
-        let url = document.getElementById('url').value;
-        let msg = document.getElementById('msg');
+        <br>
+        <button onclick="startBoost()">ЗАКАЗАТЬ</button>
         
-        if(url == "") { alert("Введите ссылку!"); return; }
+        <div id="status" class="status"></div>
+    </div>
 
-        msg.innerHTML = "🌀 Подключение к защищенному серверу...";
-        setTimeout(() => { msg.innerHTML = "🔍 Поиск аккаунта в базе данных TikTok..."; }, 2000);
-        setTimeout(() => { msg.innerHTML = "⚙️ Подготовка API потоков для " + url + "..."; }, 4000);
-        setTimeout(() => { 
-            // ЗАМЕНИ ТЕКСТ НИЖЕ НА СВОЙ TELEGRAM
-            msg.innerHTML = "<b style='color:yellow'>ОШИБКА ПРОВЕРКИ!</b><br>Чтобы завершить накрутку бесплатно, нужно подписаться на наш канал-спонсор: <br><br><a href='https://t.me/astronomnew0' style='color:#00f2ea'>ПОДПИСАТЬСЯ В TELEGRAM</a>";
-        }, 7000);
-    }
-</script>
+    <script>
+        async function startBoost() {
+            const nick = document.getElementById('nickname').value;
+            const count = document.getElementById('amount').value;
+            const statusDiv = document.getElementById('status');
 
+            if(!nick) {
+                alert("Пожалуйста, введите никнейм!");
+                return;
+            }
+
+            statusDiv.innerText = "Связь с сервером...";
+
+            try {
+                // Отправляем запрос на твой API-обработчик в Vercel
+                const response = await fetch('/api/order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nickname: nick, amount: count })
+                });
+
+                const result = await response.json();
+
+                if (result.order) {
+                    statusDiv.style.color = "#00ff00";
+                    statusDiv.innerText = "Успешно! Номер заказа: " + result.order;
+                    alert("Заказ принят! Подписчики скоро придут.");
+                } else {
+                    statusDiv.style.color = "#ff4444";
+                    statusDiv.innerText = "Ошибка: " + (result.error || "Недостаточно средств");
+                }
+            } catch (err) {
+                statusDiv.style.color = "#ff4444";
+                statusDiv.innerText = "Ошибка подключения к API";
+            }
+        }
+    </script>
 </body>
 </html>
+
 
