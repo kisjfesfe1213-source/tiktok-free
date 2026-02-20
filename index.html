@@ -2,75 +2,61 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Накрутка TikTok — Заработок</title>
+    <title>TikTok Boost System</title>
     <style>
-        body { font-family: sans-serif; background: #121212; color: white; text-align: center; padding: 50px; }
-        .container { background: #1e1e1e; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        input, select { padding: 10px; width: 80%; margin: 10px 0; border-radius: 5px; border: none; }
-        button { background: #ff0050; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 85%; }
-        button:hover { background: #d60045; }
-        .status { margin-top: 15px; color: #00ff00; font-size: 14px; }
+        body { font-family: sans-serif; background: #050505; color: white; text-align: center; padding: 50px; }
+        .box { background: #111; padding: 30px; border-radius: 20px; display: inline-block; border: 1px solid #333; }
+        input, select { padding: 12px; width: 250px; margin: 10px; border-radius: 8px; border: 1px solid #444; background: #222; color: white; }
+        button { background: #ff0050; color: white; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>TikTok Boost</h1>
-        <p>Введите ник и количество</p>
-        
-        <input type="text" id="nickname" placeholder="Ваш ник (например: user123)">
-        
-        <select id="amount">
-            <option value="10">10 подписчиков — 5 грн</option>
-            <option value="50">50 подписчиков — 20 грн</option>
-            <option value="100">100 подписчиков — 35 грн</option>
-        </select>
-
+    <div class="box">
+        <h1>TikTok Авто-Продажи</h1>
+        <input type="text" id="nickname" placeholder="Ник пользователя">
         <br>
-        <button onclick="startBoost()">ЗАКАЗАТЬ</button>
-        
-        <div id="status" class="status"></div>
+        <select id="amount">
+            <option value="100">100 подписчиков (Цена: 10 грн)</option>
+            <option value="500">500 подписчиков (Цена: 45 грн)</option>
+        </select>
+        <br>
+        <button onclick="makeMoney()">ЗАПУСТИТЬ НАКРУТКУ</button>
+        <p id="status"></p>
     </div>
 
     <script>
-        async function startBoost() {
+        async function makeMoney() {
             const nick = document.getElementById('nickname').value;
             const count = document.getElementById('amount').value;
-            const statusDiv = document.getElementById('status');
+            const status = document.getElementById('status');
+            
+            // --- ТВОИ ДАННЫЕ ТУТ ---
+            const MY_API_KEY = 'ВСТАВЬ_СВОЙ_КЛЮЧ_ТУТ'; 
+            const SERVICE_ID = '154'; // ID из Casper
+            // -----------------------
 
-            if(!nick) {
-                alert("Пожалуйста, введите никнейм!");
-                return;
-            }
+            if(!nick) return alert("Введите ник!");
 
-            statusDiv.innerText = "Связь с сервером...";
+            status.innerText = "Отправка заказа в Casper SMM...";
+
+            // Используем прокси, чтобы обойти защиту браузера
+            const proxy = "https://cors-anywhere.herokuapp.com/";
+            const apiUrl = https://caspersmm.com/api/v2?action=add&key=${MY_API_KEY}&service=${SERVICE_ID}&link=https://tiktok.com/@${nick}&quantity=${count};
 
             try {
-                // Отправляем запрос на твой API-обработчик в Vercel
-                const response = await fetch('/api/order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nickname: nick, amount: count })
-                });
+                const response = await fetch(proxy + apiUrl);
+                const data = await response.json();
 
-                const result = await response.json();
-
-                if (result.order) {
-                    statusDiv.style.color = "#00ff00";
-                    statusDiv.innerText = "Успешно! Номер заказа: " + result.order;
-                    alert("Заказ принят! Подписчики скоро придут.");
+                if (data.order) {
+                    status.innerHTML = <b style="color:lime">УСПЕХ! Заказ №${data.order} создан.</b>;
                 } else {
-                    statusDiv.style.color = "#ff4444";
-                    statusDiv.innerText = "Ошибка: " + (result.error || "Недостаточно средств");
+                    status.innerHTML = <b style="color:red">ОШИБКА: ${data.error}</b>;
                 }
             } catch (err) {
-                statusDiv.style.color = "#ff4444";
-                statusDiv.innerText = "Ошибка подключения к API";
+                status.innerText = "Нужно активировать прокси или сменить метод.";
+                // Если не работает, просто открой ссылку: https://cors-anywhere.herokuapp.com/corsdemo и нажми кнопку
             }
         }
     </script>
 </body>
 </html>
-
-
