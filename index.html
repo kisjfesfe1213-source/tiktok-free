@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Boost - Накрутка в ГРН</title>
+    <style>
+        /* Стильний дизайн */
+        body { 
+            background: #121212; 
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            text-align: center; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card { 
+            background: #1e1e1e; 
+            padding: 30px; 
+            border-radius: 20px; 
+            border: 2px solid #0057b7; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            width: 350px; 
+        }
+        h2 { color: #ffd700; margin-bottom: 20px; }
+        input { 
+            display: block; 
+            margin: 10px auto; 
+            padding: 15px; 
+            width: 90%; 
+            border-radius: 10px; 
+            border: 1px solid #333; 
+            background: #2a2a2a; 
+            color: white; 
+            font-size: 16px; 
+            outline: none;
+        }
+        input:focus { border-color: #ffd700; }
+        .info { margin: 15px 0; font-size: 14px; color: #bbb; }
+        .price-box { 
+            font-size: 28px; 
+            font-weight: bold; 
+            color: #ffd700; 
+            margin: 20px 0; 
+            background: rgba(255, 215, 0, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        button { 
+            width: 100%; 
+            padding: 18px; 
+            background: #0057b7; 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 18px; 
+            transition: 0.3s; 
+        }
+        button:hover { 
+            background: #004494; 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 87, 183, 0.4);
+        }
+        button:disabled { background: #555; cursor: not-allowed; transform: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>TikTok Boost</h2>
+    
+    <input type="text" id="username" placeholder="@username у TikTok">
+    
+    <div class="info">Ціна: 10 підписників = 1 грн</div>
+    
+    <label style="font-size: 14px; color: #888;">Кількість (мін. 5):</label>
+    <input type="number" id="quantity" value="10" min="5" oninput="calculate()">
+
+    <div class="price-box"><span id="total">1.00</span> грн</div>
+    
+    <button id="payBtn" onclick="processPayment()">ОПЛАТИТИ ТА ЗАПУСТИТИ</button>
+</div>
+
+<script>
+    // Настройки цены
+    const pricePerOne = 0.1; // 10 шт = 1 грн
+    const minOrder = 5;
+
+    // Функция расчета цены
+    function calculate() {
+        const qtyInput = document.getElementById('quantity');
+        const totalSpan = document.getElementById('total');
+        const btn = document.getElementById('payBtn');
+        
+        let qty = parseInt(qtyInput.value);
+
+        if (isNaN(qty) || qty < minOrder) {
+            totalSpan.innerText = "0.00";
+            btn.disabled = true;
+            btn.innerText = "Мін. замовлення: " + minOrder;
+        } else {
+            totalSpan.innerText = (qty * pricePerOne).toFixed(2);
+            btn.disabled = false;
+            btn.innerText = "ОПЛАТИТИ ТА ЗАПУСТИТИ";
+        }
+    }
+
+    // Функция при нажатии на кнопку
+    function processPayment() {
+        const user = document.getElementById('username').value;
+        const qty = document.getElementById('quantity').value;
+        const total = (qty * pricePerOne).toFixed(2);
+        
+        if (!user || user.length < 3) {
+            alert("Будь ласка, введіть коректний нікнейм TikTok!");
+            return;
+        }
+        // ВАЖНО: На GitHub Pages PHP не работает.
+        // Этот алерт имитирует переход на оплату.
+        alert(Замовлення прийнято!\nКористувач: ${user}\nКількість: ${qty}\nСума: ${total} грн.\n\nНа GitHub автоматика потребує підключення зовнішнього сервісу.);
+        
+        // Тут можно сделать перенаправление на ваш телеграм или платежку
+        // window.location.href = "https://t.me/vash_username"; 
+    }
+</script>
+
+</body>
+</html>
