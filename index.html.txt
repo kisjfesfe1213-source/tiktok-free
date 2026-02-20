@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Boost — Бесплатная накрутка</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; text-align: center; padding: 50px; }
+        .container { background: #1e1e1e; padding: 30px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 0 20px rgba(255, 0, 80, 0.5); }
+        h1 { color: #ff0050; }
+        input, select { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
+        button { background: #ff0050; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+        button:hover { background: #d60046; }
+        .status { margin-top: 20px; font-size: 14px; color: #aaa; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>TikTok Free</h1>
+    <p>Введите ссылку на профиль:</p>
+    <input type="text" id="url" placeholder="https://www.tiktok.com/@user">
+    
+    <p>Выберите количество:</p>
+    <select id="count">
+        <option value="100">100 подписчиков</option>
+        <option value="500">500 подписчиков</option>
+        <option value="1000">1000 подписчиков</option>
+    </select>
+
+    <button onclick="startBoost()">ЗАПУСТИТЬ НАКРУТКУ</button>
+
+    <div id="msg" class="status"></div>
+</div>
+
+<script>
+    function startBoost() {
+        let url = document.getElementById('url').value;
+        let msg = document.getElementById('msg');
+        
+        if(url == "") {
+            alert("Введите ссылку!");
+            return;
+        }
+
+        msg.innerHTML = "Подключение к серверам TikTok...";
+        
+        setTimeout(() => {
+            msg.innerHTML = "Проверка аккаунта " + url + "...";
+        }, 2000);
+
+        setTimeout(() => {
+            msg.innerHTML = "Ошибка! Для бесплатной накрутки нужно подтвердить, что вы не робот. Подпишитесь на наш Telegram: @ваш_канал";
+            msg.style.color = "yellow";
+        }, 5000);
+    }
+</script>
+
+</body>
+</html>
