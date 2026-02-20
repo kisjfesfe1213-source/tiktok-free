@@ -5,16 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TikTok Boost — Бесплатная накрутка</title>
     <style>
-        body { font-family: sans-serif; background: #121212; color: white; text-align: center; padding: 50px; }
-        .container { background: #1e1e1e; padding: 30px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 0 20px rgba(255, 0, 80, 0.5); }
-        h1 { color: #ff0050; }
-        input, select { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
-        button { background: #ff0050; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
-        button:hover { background: #d60046; }
-        .status { margin-top: 20px; font-size: 14px; color: #aaa; }
+        body { font-family: sans-serif; background: #121212; color: white; text-align: center; padding: 50px 10px; }
+        .container { background: #1e1e1e; padding: 30px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 0 20px rgba(255, 0, 80, 0.5); border: 1px solid #ff0050; }
+        h1 { color: #ff0050; text-shadow: 0 0 10px rgba(255, 0, 80, 0.5); }
+        input, select { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #222; color: white; }
+        button { background: linear-gradient(45deg, #ff0050, #00f2ea); color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .status { margin-top: 20px; font-size: 14px; color: #00f2ea; min-height: 40px; }
+        
+        /* Стиль для всплывашек */
+        #notification { position: fixed; bottom: 20px; left: 20px; background: #333; padding: 10px 20px; border-radius: 10px; border-left: 5px solid #00f2ea; display: none; animation: slideIn 0.5s; z-index: 100; font-size: 13px; }
+        @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
     </style>
 </head>
 <body>
+
+<div id="notification"></div>
 
 <div class="container">
     <h1>TikTok Free</h1>
@@ -29,30 +34,39 @@
     </select>
 
     <button onclick="startBoost()">ЗАПУСТИТЬ НАКРУТКУ</button>
-
     <div id="msg" class="status"></div>
 </div>
 
 <script>
+    // Настройки живой ленты
+    const names = ["Dmitry", "Ангелина", "Артем", "User_77", "Kira", "Maks", "Liana", "Nika", "Tiktok_Boss"];
+    const counts = [100, 250, 500, 1000];
+
+    function showNotif() {
+        const notif = document.getElementById('notification');
+        const randomName = names[Math.floor(Math.random() * names.length)];
+        const randomCount = counts[Math.floor(Math.random() * counts.length)];
+        
+        notif.innerHTML = <b>@${randomName}</b> только что получил <b>${randomCount}</b> подписчиков ✅;
+        notif.style.display = 'block';
+        
+        setTimeout(() => { notif.style.display = 'none'; }, 4000);
+    }
+    setInterval(showNotif, 8000); // Повторять каждые 8 секунд
+
     function startBoost() {
         let url = document.getElementById('url').value;
         let msg = document.getElementById('msg');
         
-        if(url == "") {
-            alert("Введите ссылку!");
-            return;
-        }
+        if(url == "") { alert("Введите ссылку!"); return; }
 
-        msg.innerHTML = "Подключение к серверам TikTok...";
-        
-        setTimeout(() => {
-            msg.innerHTML = "Проверка аккаунта " + url + "...";
-        }, 2000);
-
-        setTimeout(() => {
-            msg.innerHTML = "Ошибка! Для бесплатной накрутки нужно подтвердить, что вы не робот. Подпишитесь на наш Telegram: @ваш_канал";
-            msg.style.color = "yellow";
-        }, 5000);
+        msg.innerHTML = "🌀 Подключение к защищенному серверу...";
+        setTimeout(() => { msg.innerHTML = "🔍 Поиск аккаунта в базе данных TikTok..."; }, 2000);
+        setTimeout(() => { msg.innerHTML = "⚙️ Подготовка API потоков для " + url + "..."; }, 4000);
+        setTimeout(() => { 
+            // ЗАМЕНИ ТЕКСТ НИЖЕ НА СВОЙ TELEGRAM
+            msg.innerHTML = "<b style='color:yellow'>ОШИБКА ПРОВЕРКИ!</b><br>Чтобы завершить накрутку бесплатно, нужно подписаться на наш канал-спонсор: <br><br><a href='https://t.me/ТВОЙ_НИК' style='color:#00f2ea'>ПОДПИСАТЬСЯ В TELEGRAM</a>";
+        }, 7000);
     }
 </script>
 
