@@ -1,15 +1,21 @@
 <?php
-// --- НАСТРОЙКИ ВАШЕГО ПОСТАВЩИКА ---
-$api_url = "https://caspersmm.com/api/v2"; // Уточните в документации поставщика (обычно заканчивается на /api/v2)
-$api_key = "72cc13893933e00646ad73e1b2a33352"; // Вставьте сюда ваш ключ
-$service_id = "170"; // ID услуги ТикТок Подписчики (узнайте в списке услуг на сайте поставщика)
+// --- НАСТРОЙКИ ---
+$price_per_one = 0.1; // Цена за 1 подписчика (10 шт = 1 грн, значит 1 шт = 0.1 грн)
+$min_order = 5;       // Минимальный заказ
+$api_key = "ВАШ_API_КЛЮЧ"; 
+$service_id = "123";  
+$api_url = "https://сайт-поставщика.com/api/v2";
 
-// 1. ОБРАБОТКА ПОСЛЕ "ОПЛАТЫ"
+// ОБРАБОТКА ЗАКАЗА ПОСЛЕ "ОПЛАТЫ"
 if (isset($_GET['payment_success'])) {
     $user = htmlspecialchars($_GET['user']);
     $count = (int)$_GET['count'];
 
-    // ОТПРАВЛЯЕМ ЗАПРОС ПОСТАВЩИКУ (АВТОМАТИКА)
+    if ($count < $min_order) {
+        die("Ошибка: минимальный заказ - $min_order");
+    }
+
+    // Авто-запрос к вашему поставщику
     $post_data = [
         'key' => $api_key,
         'action' => 'add',
@@ -25,52 +31,82 @@ if (isset($_GET['payment_success'])) {
     $response = curl_exec($ch);
     curl_close($ch);
 
-    // ЗАПИСЫВАЕМ В ЛОГ ДЛЯ ВАС
-    $log = date('Y-m-d H:i:s') . " | Юзер: $user | Кол-во: $count | Ответ API: $response\n";
+    // Запись в лог заказов
+    $total_paid = $count * $price_per_one;
+    $log = date('Y-m-d H:i:s') . " | Юзер: $user | Кол-во: $count | Оплачено: $total_paid грн. | Ответ API: $response\n";
     file_put_contents('automated_orders.txt', $log, FILE_APPEND);
 
-    echo "<h1>Оплата принята! Накрутка для $user запущена автоматически.</h1>";
-    echo "<p>Результат системы: " . htmlspecialchars($response) . "</p>";
-    echo "<a href='/'>На главную</a>";
+    echo "<body style='background:#121212;color:white;text-align:center;padding-top:100px;font-family:sans-serif;'>";
+    echo "<h1>Оплата принята!</h1>";
+    echo "<p>Заказано $count подписчиков для <b>$user</b>. Сумма: $total_paid грн.</p>";
+    echo "<br><a href='/' style='color:#ff0050;'>Вернуться назад</a>";
+    echo "</body>";
     exit;
 }
 ?>
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>TikTok Auto-Boost</title>
+    <title>TikTok Boost - Гривны</title>
     <style>
-        body { background: #121212; color: white; font-family: sans-serif; text-align: center; padding: 50px; }
-        .card { background: #1e1e1e; padding: 30px; border-radius: 15px; display: inline-block; border: 1px solid #ff0050; }
-        input, button { display: block; margin: 15px auto; padding: 12px; width: 280px; border-radius: 8px; border: none; }
-        button { background: #ff0050; color: white; font-weight: bold; cursor: pointer; }
+        body { background: #121212; color: white; font-family: sans-serif; text-align: center; padding-top: 50px; }
+        .card { background: #1e1e1e; padding: 25px; border-radius: 15px; display: inline-block; border: 2px solid #0057b7; width: 320px; }
+        input { display: block; margin: 10px auto; padding: 12px; width: 90%; border-radius: 8px; border: none; background: #333; color: white; font-size: 16px; }
+        .info { margin: 15px 0; font-size: 14px; color: #bbb; }
+        .price-box { font-size: 24px; font-weight: bold; color: #ffd700; margin-bottom: 20px; }
+        button { width: 100%; padding: 15px; background: #0057b7; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:hover { background: #004494; box-shadow: 0 0 10px #0057b7; }
+        button:disabled { background: #555; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>TikTok Авто-Накрутка</h2>
-    <input type="text" id="username" placeholder="@username">
-    <input type="number" id="quantity" value="100" min="10">
-    <button onclick="payAndStart()">ОПЛАТИТЬ И ЗАПУСТИТЬ</button>
+    <h2 style="color: #ffd700;">TikTok Накрутка</h2>
+    
+    <input type="text" id="username" placeholder="@username у TikTok">
+    
+    <div class="info">Вартість: 10 підп. = 1 грн</div>
+    
+    <label>Кількість (мін. <?php echo $min_order; ?>):</label>
+    <input type="number" id="quantity" value="10" min="<?php echo $min_order; ?>" oninput="calculate()">
+
+    <div class="price-box">До сплати: <span id="total">1.00</span> грн</div>
+    
+    <button id="payBtn" onclick="processPayment()">ОПЛАТИТИ В ГРН</button>
 </div>
 
 <script>
-function payAndStart() {
-    const user = document.getElementById('username').value;
-    const count = document.getElementById('quantity').value;
+    const pricePerOne = <?php echo $price_per_one; ?>;
+    const minOrder = <?php echo $min_order; ?>;
 
-    if(!user) return alert("Введите ник!");
+    function calculate() {
+        const qty = document.getElementById('quantity').value;
+        const totalSpan = document.getElementById('total');
+        const btn = document.getElementById('payBtn');
 
-    // Имитация перехода на оплату
-    alert("Переходим к оплате...");
-    
-    // После "оплаты" перенаправляем на этот же файл с параметрами
-    window.location.href = ?payment_success=1&user=${encodeURIComponent(user)}&count=${count};
-}
+        if (qty < minOrder) {
+            totalSpan.innerText = "0";
+            btn.disabled = true;
+            btn.innerText = "Мін. замовлення: " + minOrder;
+        } else {
+            totalSpan.innerText = (qty * pricePerOne).toFixed(2);
+            btn.disabled = false;
+            btn.innerText = "ОПЛАТИТИ В ГРН";
+        }
+    }
+function processPayment() {
+        const user = document.getElementById('username').value;
+        const qty = document.getElementById('quantity').value;
+        
+        if (!user || user.length < 3) return alert("Введіть нік TikTok!");
+
+        alert("Перенаправлення на оплату в гривнях...");
+        // Імітація успішної оплати
+        window.location.href = ?payment_success=1&user=${encodeURIComponent(user)}&count=${qty};
+    }
 </script>
 
 </body>
 </html>
-
