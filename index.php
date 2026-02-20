@@ -2,9 +2,9 @@
 // --- НАСТРОЙКИ ---
 $price_per_one = 0.1; // Цена за 1 подписчика (10 шт = 1 грн, значит 1 шт = 0.1 грн)
 $min_order = 5;       // Минимальный заказ
-$api_key = "ВАШ_API_КЛЮЧ"; 
-$service_id = "123";  
-$api_url = "https://сайт-поставщика.com/api/v2";
+$api_key = "72cc13893933e00646ad73e1b2a33352"; 
+$service_id = "170";  
+$api_url = "https://caspersmm.com/api/v2";
 
 // ОБРАБОТКА ЗАКАЗА ПОСЛЕ "ОПЛАТЫ"
 if (isset($_GET['payment_success'])) {
@@ -110,3 +110,4 @@ function processPayment() {
 
 </body>
 </html>
+
