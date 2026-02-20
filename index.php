@@ -1,18 +1,37 @@
 <?php
-// СЕКРЕТНЫЙ КЛЮЧ (придумайте сами)
-$my_secret_key = "TOP_SECRET_123";
+// --- НАСТРОЙКИ ВАШЕГО ПОСТАВЩИКА ---
+$api_url = "https://сайт-поставщика.com/api/v2"; // Уточните в документации поставщика (обычно заканчивается на /api/v2)
+$api_key = "ВАШ_API_КЛЮЧ_ЗДЕСЬ"; // Вставьте сюда ваш ключ
+$service_id = "123"; // ID услуги ТикТок Подписчики (узнайте в списке услуг на сайте поставщика)
 
-// 1. ОБРАБОТКА УСПЕШНОЙ ОПЛАТЫ (Сюда платежка пришлет уведомление)
-if (isset($_GET['payment_success']) && $_GET['key'] === $my_secret_key) {
+// 1. ОБРАБОТКА ПОСЛЕ "ОПЛАТЫ"
+if (isset($_GET['payment_success'])) {
     $user = htmlspecialchars($_GET['user']);
-    $count = htmlspecialchars($_GET['count']);
-    
-    // ЗАПИСЬ В ВАШ ФАЙЛ (Только после оплаты)
-    $log = date('Y-m-d H:i:s') . " | ОПЛАЧЕНО | Юзер: $user | Кол-во: $count | Статус: Запуск накрутки\n";
-    file_put_contents('paid_orders.txt', $log, FILE_APPEND);
-    
-    echo "<h1>Оплата прошла! Накрутка запущена для $user</h1>";
-    echo "<a href='/'>Вернуться на сайт</a>";
+    $count = (int)$_GET['count'];
+
+    // ОТПРАВЛЯЕМ ЗАПРОС ПОСТАВЩИКУ (АВТОМАТИКА)
+    $post_data = [
+        'key' => $api_key,
+        'action' => 'add',
+        'service' => $service_id,
+        'link' => 'https://www.tiktok.com/@' . $user,
+        'quantity' => $count
+    ];
+
+    $ch = curl_init($api_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    // ЗАПИСЫВАЕМ В ЛОГ ДЛЯ ВАС
+    $log = date('Y-m-d H:i:s') . " | Юзер: $user | Кол-во: $count | Ответ API: $response\n";
+    file_put_contents('automated_orders.txt', $log, FILE_APPEND);
+
+    echo "<h1>Оплата принята! Накрутка для $user запущена автоматически.</h1>";
+    echo "<p>Результат системы: " . htmlspecialchars($response) . "</p>";
+    echo "<a href='/'>На главную</a>";
     exit;
 }
 ?>
@@ -20,57 +39,36 @@ if (isset($_GET['payment_success']) && $_GET['key'] === $my_secret_key) {
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>TikTok Pay & Boost</title>
+    <title>TikTok Auto-Boost</title>
     <style>
-        body { background: #121212; color: white; font-family: sans-serif; text-align: center; padding-top: 50px; }
-        .box { background: #1e1e1e; padding: 20px; display: inline-block; border-radius: 10px; border: 1px solid #ff0050; }
-        input, button { display: block; margin: 10px auto; padding: 12px; width: 280px; border-radius: 5px; border: none; font-size: 16px; }
-        input { background: #333; color: white; }
-        .price-tag { color: #ff0050; font-size: 20px; font-weight: bold; margin: 10px 0; }
-        button { background: #ff0050; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        button:hover { background: #ff0050; box-shadow: 0 0 15px #ff0050; }
+        body { background: #121212; color: white; font-family: sans-serif; text-align: center; padding: 50px; }
+        .card { background: #1e1e1e; padding: 30px; border-radius: 15px; display: inline-block; border: 1px solid #ff0050; }
+        input, button { display: block; margin: 15px auto; padding: 12px; width: 280px; border-radius: 8px; border: none; }
+        button { background: #ff0050; color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>Накрутка TikTok</h2>
-    
-    <input type="text" id="tiktok_user" placeholder="@username">
-    
-    <p>Выберите количество подписчиков:</p>
-    <input type="number" id="count" value="100" min="10" oninput="updatePrice()">
-    
-    <div class="price-tag">К оплате: <span id="total_price">50</span>₽</div>
-    
-    <button onclick="goToPayment()">Оплатить и запустить</button>
+<div class="card">
+    <h2>TikTok Авто-Накрутка</h2>
+    <input type="text" id="username" placeholder="@username">
+    <input type="number" id="quantity" value="100" min="10">
+    <button onclick="payAndStart()">ОПЛАТИТЬ И ЗАПУСТИТЬ</button>
 </div>
 
 <script>
-    const pricePerOne = 0.5; // Цена за 1 подписчика (например, 50 копеек)
+function payAndStart() {
+    const user = document.getElementById('username').value;
+    const count = document.getElementById('quantity').value;
 
-    function updatePrice() {
-        const count = document.getElementById('count').value;
-        document.getElementById('total_price').innerText = Math.floor(count * pricePerOne);
-    }
+    if(!user) return alert("Введите ник!");
 
-    function goToPayment() {
-        const user = document.getElementById('tiktok_user').value;
-        const count = document.getElementById('count').value;
-        const price = Math.floor(count * pricePerOne);
-
-        if(!user || user.length < 3) {
-            alert("Введите правильный юзернейм!");
-            return;
-        }
-
-        // В РЕАЛЬНОСТИ: Тут идет переход на сайт платежки (QIWI/LAVA/etc)
-        // СЕЙЧАС: Имитируем переход на страницу успешной оплаты
-        alert(Перенаправляем на шлюз оплаты... Сумма: ${price} руб.);
-        
-        // После "оплаты" перекидываем на подтверждение (в реальном API это делает платежка автоматически)
-        window.location.href = ?payment_success=1&user=${user}&count=${count}&key=TOP_SECRET_123;
-    }
+    // Имитация перехода на оплату
+    alert("Переходим к оплате...");
+    
+    // После "оплаты" перенаправляем на этот же файл с параметрами
+    window.location.href = ?payment_success=1&user=${encodeURIComponent(user)}&count=${count};
+}
 </script>
 
 </body>
