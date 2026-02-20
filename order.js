@@ -3,7 +3,7 @@ export default async function handler(req, res) {
 
     const { nickname, count } = req.body;
     const API_KEY = process.env.CASPER_API_KEY; // Твой ключ из настроек Vercel
-    const SERVICE_ID = "154"; // ЗАМЕНИ ЭТО на ID услуги из Casper (например 154)
+    const SERVICE_ID = "170"; // ЗАМЕНИ ЭТО на ID услуги из Casper (например 154)
 
     const url = https://caspersmm.com/api/v2?action=add&key=${API_KEY}&service=${SERVICE_ID}&link=https://www.tiktok.com/@${nickname}&quantity=${count};
 
